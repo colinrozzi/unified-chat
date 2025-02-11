@@ -202,40 +202,60 @@ impl ActorGuest for Component {
     }
 }
 
-// Handle HTTP requests from the browser
 impl HttpGuest for Component {
     fn handle_request(req: ServerHttpRequest, state: Json) -> (HttpResponse, Json) {
-        let current_state: State = serde_json::from_slice(&state).unwrap();
+        log(&format!("Handling HTTP request for: {}", req.uri));
 
-        match (req.method.as_str(), req.uri.as_str()) {
+        let response = match (req.method.as_str(), req.uri.as_str()) {
+            ("GET", "/") | ("GET", "/index.html") => {
+                let content = read_file("assets/index.html").unwrap();
+                HttpResponse {
+                    status: 200,
+                    headers: vec![("Content-Type".to_string(), "text/html".to_string())],
+                    body: Some(content),
+                }
+            }
+            ("GET", "/styles.css") => {
+                let content = read_file("assets/styles.css").unwrap();
+                HttpResponse {
+                    status: 200,
+                    headers: vec![("Content-Type".to_string(), "text/css".to_string())],
+                    body: Some(content),
+                }
+            }
+            ("GET", "/chat.js") => {
+                let content = read_file("assets/chat.js").unwrap();
+                HttpResponse {
+                    status: 200,
+                    headers: vec![(
+                        "Content-Type".to_string(),
+                        "application/javascript".to_string(),
+                    )],
+                    body: Some(content),
+                }
+            }
+
+            // API endpoints
             ("GET", "/api/chats") => {
+                let current_state: State = serde_json::from_slice(&state).unwrap();
                 if let Ok(chats) = current_state.list_chats() {
-                    (
-                        HttpResponse {
-                            status: 200,
-                            headers: vec![(
-                                "Content-Type".to_string(),
-                                "application/json".to_string(),
-                            )],
-                            body: Some(
-                                serde_json::to_vec(&json!({
-                                    "status": "success",
-                                    "chats": chats
-                                }))
-                                .unwrap(),
-                            ),
-                        },
-                        state,
-                    )
+                    HttpResponse {
+                        status: 200,
+                        headers: vec![("Content-Type".to_string(), "application/json".to_string())],
+                        body: Some(
+                            serde_json::to_vec(&json!({
+                                "status": "success",
+                                "chats": chats
+                            }))
+                            .unwrap(),
+                        ),
+                    }
                 } else {
-                    (
-                        HttpResponse {
-                            status: 500,
-                            headers: vec![],
-                            body: Some(b"Failed to list chats".to_vec()),
-                        },
-                        state,
-                    )
+                    HttpResponse {
+                        status: 500,
+                        headers: vec![],
+                        body: Some(b"Failed to list chats".to_vec()),
+                    }
                 }
             }
 
@@ -247,6 +267,7 @@ impl HttpGuest for Component {
                             head: None,
                         };
 
+                        let current_state: State = serde_json::from_slice(&state).unwrap();
                         if current_state.save_chat(&chat).is_ok() {
                             return (
                                 HttpResponse {
@@ -281,6 +302,8 @@ impl HttpGuest for Component {
 
             ("GET", path) if path.starts_with("/api/chats/") => {
                 let chat_id = path.trim_start_matches("/api/chats/");
+                let current_state: State = serde_json::from_slice(&state).unwrap();
+
                 if let Ok(chat) = current_state.read_chat(chat_id) {
                     if let Some(head) = &chat.head {
                         if let Ok(messages) = current_state.get_message_history(head) {
@@ -316,15 +339,15 @@ impl HttpGuest for Component {
                 )
             }
 
-            _ => (
-                HttpResponse {
-                    status: 404,
-                    headers: vec![],
-                    body: None,
-                },
-                state,
-            ),
-        }
+            // Default 404 response
+            _ => HttpResponse {
+                status: 404,
+                headers: vec![],
+                body: Some(b"Not Found".to_vec()),
+            },
+        };
+
+        (response, state)
     }
 }
 
