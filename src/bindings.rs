@@ -500,6 +500,54 @@ pub mod ntwk {
                     }
                 }
             }
+            #[allow(unused_unsafe, clippy::all)]
+            pub fn path_exists(path: &str) -> Result<bool, _rt::String> {
+                unsafe {
+                    #[repr(align(4))]
+                    struct RetArea([::core::mem::MaybeUninit<u8>; 12]);
+                    let mut ret_area = RetArea([::core::mem::MaybeUninit::uninit(); 12]);
+                    let vec0 = path;
+                    let ptr0 = vec0.as_ptr().cast::<u8>();
+                    let len0 = vec0.len();
+                    let ptr1 = ret_area.0.as_mut_ptr().cast::<u8>();
+                    #[cfg(target_arch = "wasm32")]
+                    #[link(wasm_import_module = "ntwk:theater/filesystem")]
+                    extern "C" {
+                        #[link_name = "path-exists"]
+                        fn wit_import(_: *mut u8, _: usize, _: *mut u8);
+                    }
+                    #[cfg(not(target_arch = "wasm32"))]
+                    fn wit_import(_: *mut u8, _: usize, _: *mut u8) {
+                        unreachable!()
+                    }
+                    wit_import(ptr0.cast_mut(), len0, ptr1);
+                    let l2 = i32::from(*ptr1.add(0).cast::<u8>());
+                    match l2 {
+                        0 => {
+                            let e = {
+                                let l3 = i32::from(*ptr1.add(4).cast::<u8>());
+                                _rt::bool_lift(l3 as u8)
+                            };
+                            Ok(e)
+                        }
+                        1 => {
+                            let e = {
+                                let l4 = *ptr1.add(4).cast::<*mut u8>();
+                                let l5 = *ptr1.add(8).cast::<usize>();
+                                let len6 = l5;
+                                let bytes6 = _rt::Vec::from_raw_parts(
+                                    l4.cast(),
+                                    len6,
+                                    len6,
+                                );
+                                _rt::string_lift(bytes6)
+                            };
+                            Err(e)
+                        }
+                        _ => _rt::invalid_enum_discriminant(),
+                    }
+                }
+            }
         }
         #[allow(dead_code, clippy::all)]
         pub mod message_server_host {
@@ -1600,6 +1648,17 @@ mod _rt {
         let layout = alloc::Layout::from_size_align_unchecked(size, align);
         alloc::dealloc(ptr, layout);
     }
+    pub unsafe fn bool_lift(val: u8) -> bool {
+        if cfg!(debug_assertions) {
+            match val {
+                0 => false,
+                1 => true,
+                _ => panic!("invalid bool discriminant"),
+            }
+        } else {
+            val != 0
+        }
+    }
     pub use alloc_crate::alloc;
     #[cfg(target_arch = "wasm32")]
     pub fn run_ctors_once() {
@@ -1708,8 +1767,8 @@ pub(crate) use __export_unified_chat_impl as export;
 #[cfg(target_arch = "wasm32")]
 #[link_section = "component-type:wit-bindgen:0.36.0:ntwk:theater:unified-chat:encoded world"]
 #[doc(hidden)]
-pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 1784] = *b"\
-\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xf5\x0c\x01A\x02\x01\
+pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 1817] = *b"\
+\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\x96\x0d\x01A\x02\x01\
 A\x1b\x01B\x0e\x01p}\x04\0\x04json\x03\0\0\x01p}\x04\0\x05state\x03\0\x02\x01s\x04\
 \0\x08actor-id\x03\0\x04\x01kw\x01r\x03\x0aevent-types\x06parent\x06\x04data\x01\
 \x04\0\x05event\x03\0\x07\x01r\x02\x04hashw\x05event\x08\x04\0\x0ameta-event\x03\
@@ -1719,40 +1778,41 @@ id\x01B\x0c\x02\x03\x02\x01\x01\x04\0\x04json\x03\0\0\x02\x03\x02\x01\x02\x04\0\
 chain\x03\0\x02\x02\x03\x02\x01\x03\x04\0\x08actor-id\x03\0\x04\x01@\x01\x03msgs\
 \x01\0\x04\0\x03log\x01\x06\x01@\x01\x0dmanifest-paths\0\x05\x04\0\x05spawn\x01\x07\
 \x01@\0\0\x03\x04\0\x09get-chain\x01\x08\x03\0\x14ntwk:theater/runtime\x05\x04\x01\
-B\x0f\x01p}\x01j\x01\0\x01s\x01@\x01\x04paths\0\x01\x04\0\x09read-file\x01\x02\x01\
+B\x12\x01p}\x01j\x01\0\x01s\x01@\x01\x04paths\0\x01\x04\0\x09read-file\x01\x02\x01\
 j\0\x01s\x01@\x02\x04paths\x07contents\0\x03\x04\0\x0awrite-file\x01\x04\x01ps\x01\
 j\x01\x05\x01s\x01@\x01\x04paths\0\x06\x04\0\x0alist-files\x01\x07\x01@\x01\x04p\
 aths\0\x03\x04\0\x0bdelete-file\x01\x08\x04\0\x0acreate-dir\x01\x08\x04\0\x0adel\
-ete-dir\x01\x08\x03\0\x17ntwk:theater/filesystem\x05\x05\x01B\x0a\x02\x03\x02\x01\
-\x01\x04\0\x04json\x03\0\0\x02\x03\x02\x01\x03\x04\0\x08actor-id\x03\0\x02\x01j\0\
-\x01s\x01@\x02\x08actor-id\x03\x03msg\x01\0\x04\x04\0\x04send\x01\x05\x01j\x01\x01\
-\x01s\x01@\x02\x08actor-id\x03\x03msg\x01\0\x06\x04\0\x07request\x01\x07\x03\0\x20\
-ntwk:theater/message-server-host\x05\x06\x01B\x09\x01p}\x04\0\x05bytes\x03\0\0\x01\
-o\x02ss\x01p\x02\x01k\x01\x01r\x04\x06methods\x03uris\x07headers\x03\x04body\x04\
-\x04\0\x0chttp-request\x03\0\x05\x01r\x03\x06status{\x07headers\x03\x04body\x04\x04\
-\0\x0dhttp-response\x03\0\x07\x03\0\x17ntwk:theater/http-types\x05\x07\x02\x03\0\
-\x04\x0chttp-request\x02\x03\0\x04\x0dhttp-response\x01B\x08\x02\x03\x02\x01\x01\
-\x04\0\x04json\x03\0\0\x02\x03\x02\x01\x08\x04\0\x0chttp-request\x03\0\x02\x02\x03\
-\x02\x01\x09\x04\0\x0dhttp-response\x03\0\x04\x01@\x01\x03req\x03\0\x05\x04\0\x09\
-send-http\x01\x06\x03\0\x18ntwk:theater/http-client\x05\x0a\x02\x03\0\0\x05event\
-\x01B\x09\x02\x03\x02\x01\x01\x04\0\x04json\x03\0\0\x02\x03\x02\x01\x0b\x04\0\x05\
-event\x03\0\x02\x01@\x02\x03msg\x01\x05state\x01\0\x01\x04\0\x0bhandle-send\x01\x04\
-\x01o\x02\x01\x01\x01@\x02\x03msg\x01\x05state\x01\0\x05\x04\0\x0ehandle-request\
-\x01\x06\x04\0\"ntwk:theater/message-server-client\x05\x0c\x01B\x0d\x01q\x07\x04\
-text\0\0\x06binary\0\0\x07connect\0\0\x05close\0\0\x04ping\0\0\x04pong\0\0\x05ot\
-her\x01s\0\x04\0\x0cmessage-type\x03\0\0\x01p}\x01k\x02\x01ks\x01r\x03\x02ty\x01\
-\x04data\x03\x04text\x04\x04\0\x11websocket-message\x03\0\x05\x01p\x06\x01r\x01\x08\
-messages\x07\x04\0\x12websocket-response\x03\0\x08\x01o\x02\x02\x09\x01@\x02\x07\
-message\x06\x05state\x02\0\x0a\x04\0\x0ehandle-message\x01\x0b\x04\0\x1dntwk:the\
-ater/websocket-server\x05\x0d\x01B\x06\x02\x03\x02\x01\x01\x04\0\x04json\x03\0\0\
-\x02\x03\x02\x01\x0b\x04\0\x05event\x03\0\x02\x01@\0\0\x01\x04\0\x04init\x01\x04\
-\x04\0\x12ntwk:theater/actor\x05\x0e\x02\x03\0\0\x05state\x01B\x09\x02\x03\x02\x01\
-\x0f\x04\0\x05state\x03\0\0\x02\x03\x02\x01\x08\x04\0\x0chttp-request\x03\0\x02\x02\
-\x03\x02\x01\x09\x04\0\x0dhttp-response\x03\0\x04\x01o\x02\x05\x01\x01@\x02\x03r\
-eq\x03\x05state\x01\0\x06\x04\0\x0ehandle-request\x01\x07\x04\0\x18ntwk:theater/\
-http-server\x05\x10\x04\0\x19ntwk:theater/unified-chat\x04\0\x0b\x12\x01\0\x0cun\
-ified-chat\x03\0\0\0G\x09producers\x01\x0cprocessed-by\x02\x0dwit-component\x070\
-.220.1\x10wit-bindgen-rust\x060.36.0";
+ete-dir\x01\x08\x01j\x01\x7f\x01s\x01@\x01\x04paths\0\x09\x04\0\x0bpath-exists\x01\
+\x0a\x03\0\x17ntwk:theater/filesystem\x05\x05\x01B\x0a\x02\x03\x02\x01\x01\x04\0\
+\x04json\x03\0\0\x02\x03\x02\x01\x03\x04\0\x08actor-id\x03\0\x02\x01j\0\x01s\x01\
+@\x02\x08actor-id\x03\x03msg\x01\0\x04\x04\0\x04send\x01\x05\x01j\x01\x01\x01s\x01\
+@\x02\x08actor-id\x03\x03msg\x01\0\x06\x04\0\x07request\x01\x07\x03\0\x20ntwk:th\
+eater/message-server-host\x05\x06\x01B\x09\x01p}\x04\0\x05bytes\x03\0\0\x01o\x02\
+ss\x01p\x02\x01k\x01\x01r\x04\x06methods\x03uris\x07headers\x03\x04body\x04\x04\0\
+\x0chttp-request\x03\0\x05\x01r\x03\x06status{\x07headers\x03\x04body\x04\x04\0\x0d\
+http-response\x03\0\x07\x03\0\x17ntwk:theater/http-types\x05\x07\x02\x03\0\x04\x0c\
+http-request\x02\x03\0\x04\x0dhttp-response\x01B\x08\x02\x03\x02\x01\x01\x04\0\x04\
+json\x03\0\0\x02\x03\x02\x01\x08\x04\0\x0chttp-request\x03\0\x02\x02\x03\x02\x01\
+\x09\x04\0\x0dhttp-response\x03\0\x04\x01@\x01\x03req\x03\0\x05\x04\0\x09send-ht\
+tp\x01\x06\x03\0\x18ntwk:theater/http-client\x05\x0a\x02\x03\0\0\x05event\x01B\x09\
+\x02\x03\x02\x01\x01\x04\0\x04json\x03\0\0\x02\x03\x02\x01\x0b\x04\0\x05event\x03\
+\0\x02\x01@\x02\x03msg\x01\x05state\x01\0\x01\x04\0\x0bhandle-send\x01\x04\x01o\x02\
+\x01\x01\x01@\x02\x03msg\x01\x05state\x01\0\x05\x04\0\x0ehandle-request\x01\x06\x04\
+\0\"ntwk:theater/message-server-client\x05\x0c\x01B\x0d\x01q\x07\x04text\0\0\x06\
+binary\0\0\x07connect\0\0\x05close\0\0\x04ping\0\0\x04pong\0\0\x05other\x01s\0\x04\
+\0\x0cmessage-type\x03\0\0\x01p}\x01k\x02\x01ks\x01r\x03\x02ty\x01\x04data\x03\x04\
+text\x04\x04\0\x11websocket-message\x03\0\x05\x01p\x06\x01r\x01\x08messages\x07\x04\
+\0\x12websocket-response\x03\0\x08\x01o\x02\x02\x09\x01@\x02\x07message\x06\x05s\
+tate\x02\0\x0a\x04\0\x0ehandle-message\x01\x0b\x04\0\x1dntwk:theater/websocket-s\
+erver\x05\x0d\x01B\x06\x02\x03\x02\x01\x01\x04\0\x04json\x03\0\0\x02\x03\x02\x01\
+\x0b\x04\0\x05event\x03\0\x02\x01@\0\0\x01\x04\0\x04init\x01\x04\x04\0\x12ntwk:t\
+heater/actor\x05\x0e\x02\x03\0\0\x05state\x01B\x09\x02\x03\x02\x01\x0f\x04\0\x05\
+state\x03\0\0\x02\x03\x02\x01\x08\x04\0\x0chttp-request\x03\0\x02\x02\x03\x02\x01\
+\x09\x04\0\x0dhttp-response\x03\0\x04\x01o\x02\x05\x01\x01@\x02\x03req\x03\x05st\
+ate\x01\0\x06\x04\0\x0ehandle-request\x01\x07\x04\0\x18ntwk:theater/http-server\x05\
+\x10\x04\0\x19ntwk:theater/unified-chat\x04\0\x0b\x12\x01\0\x0cunified-chat\x03\0\
+\0\0G\x09producers\x01\x0cprocessed-by\x02\x0dwit-component\x070.220.1\x10wit-bi\
+ndgen-rust\x060.36.0";
 #[inline(never)]
 #[doc(hidden)]
 pub fn __link_custom_section_describing_imports() {

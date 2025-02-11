@@ -10,7 +10,7 @@ use bindings::exports::ntwk::theater::websocket_server::Guest as WebSocketGuest;
 use bindings::exports::ntwk::theater::websocket_server::{
     MessageType, WebsocketMessage, WebsocketResponse,
 };
-use bindings::ntwk::theater::filesystem::{read_file, write_file};
+use bindings::ntwk::theater::filesystem::{create_dir, path_exists, read_file, write_file};
 use bindings::ntwk::theater::http_client::{send_http, HttpRequest};
 use bindings::ntwk::theater::runtime::log;
 use bindings::ntwk::theater::types::Json;
@@ -181,6 +181,21 @@ impl State {
 
         Err("Failed to generate response".into())
     }
+
+    // Create necessary directories
+    fn ensure_directories(&self) -> Result<(), Box<dyn std::error::Error>> {
+        // Create main chat directory
+        let base_path = format!("data/{}", self.chat_directory);
+        create_dir(&base_path)?;
+
+        // Initialize chats.txt if it doesn't exist
+        let chats_path = format!("{}/chats.txt", base_path);
+        if !path_exists(&chats_path).expect("Failed to check path existence") {
+            write_file(&chats_path, &serde_json::to_string(&Vec::<String>::new())?).unwrap();
+        }
+
+        Ok(())
+    }
 }
 
 struct Component;
@@ -198,6 +213,9 @@ impl ActorGuest for Component {
             api_key,
             connected_clients: HashMap::new(),
         };
+
+        // Ensure directories exist
+        initial_state.ensure_directories().unwrap();
 
         serde_json::to_vec(&initial_state).unwrap()
     }
@@ -392,6 +410,41 @@ impl WebSocketGuest for Component {
                 if let Some(text) = msg.text {
                     if let Ok(command) = serde_json::from_str::<Value>(&text) {
                         match command["type"].as_str() {
+                            Some("new_chat") => {
+                                if let Some(title) = command["title"].as_str() {
+                                    // Create new chat
+                                    let chat = Chat {
+                                        title: title.to_string(),
+                                        head: None,
+                                    };
+
+                                    // Save the chat
+                                    if current_state.save_chat(&chat).is_ok() {
+                                        // Get updated chat list
+                                        if let Ok(chats) = current_state.list_chats() {
+                                            log(&format!("Created new chat: {}", title));
+                                            // Send success response with updated chat list
+                                            return (
+                                                serde_json::to_vec(&current_state).unwrap(),
+                                                WebsocketResponse {
+                                                    messages: vec![WebsocketMessage {
+                                                        ty: MessageType::Text,
+                                                        text: Some(
+                                                            serde_json::json!({
+                                                                "status": "success",
+                                                                "type": "chat_update",
+                                                                "chats": chats
+                                                            })
+                                                            .to_string(),
+                                                        ),
+                                                        data: None,
+                                                    }],
+                                                },
+                                            );
+                                        }
+                                    }
+                                }
+                            }
                             Some("send_message") => {
                                 if let (Some(content), Some(chat_id)) =
                                     (command["content"].as_str(), command["chat_id"].as_str())
@@ -446,7 +499,30 @@ impl WebSocketGuest for Component {
                                     }
                                 }
                             }
-                            _ => {}
+                            Some("get_all") => {
+                                // Return all chats when requested
+                                if let Ok(chats) = current_state.list_chats() {
+                                    return (
+                                        serde_json::to_vec(&current_state).unwrap(),
+                                        WebsocketResponse {
+                                            messages: vec![WebsocketMessage {
+                                                ty: MessageType::Text,
+                                                text: Some(
+                                                    serde_json::json!({
+                                                        "status": "success",
+                                                        "chats": chats
+                                                    })
+                                                    .to_string(),
+                                                ),
+                                                data: None,
+                                            }],
+                                        },
+                                    );
+                                }
+                            }
+                            _ => {
+                                log("Unknown command type received");
+                            }
                         }
                     }
                 }
