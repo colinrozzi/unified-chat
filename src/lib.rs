@@ -500,24 +500,31 @@ impl WebSocketGuest for Component {
                                 }
                             }
                             Some("get_all") => {
-                                // Return all chats when requested
-                                if let Ok(chats) = current_state.list_chats() {
-                                    return (
-                                        serde_json::to_vec(&current_state).unwrap(),
-                                        WebsocketResponse {
-                                            messages: vec![WebsocketMessage {
-                                                ty: MessageType::Text,
-                                                text: Some(
-                                                    serde_json::json!({
-                                                        "status": "success",
-                                                        "chats": chats
-                                                    })
-                                                    .to_string(),
-                                                ),
-                                                data: None,
-                                            }],
-                                        },
-                                    );
+                                log("Handling get_all command");
+                                match current_state.list_chats() {
+                                    Ok(chats) => {
+                                        log(&format!("Successfully listed {} chats", chats.len()));
+                                        return (
+                                            serde_json::to_vec(&current_state).unwrap(),
+                                            WebsocketResponse {
+                                                messages: vec![WebsocketMessage {
+                                                    ty: MessageType::Text,
+                                                    text: Some(
+                                                        serde_json::json!({
+                                                            "status": "success",
+                                                            "type": "chat_update",
+                                                            "chats": chats
+                                                        })
+                                                        .to_string(),
+                                                    ),
+                                                    data: None,
+                                                }],
+                                            },
+                                        );
+                                    }
+                                    Err(e) => {
+                                        log(&format!("Error listing chats: {}", e));
+                                    }
                                 }
                             }
                             _ => {
