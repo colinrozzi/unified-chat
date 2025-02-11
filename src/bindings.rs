@@ -855,6 +855,127 @@ pub mod ntwk {
 pub mod exports {
     pub mod ntwk {
         pub mod theater {
+            #[allow(dead_code, clippy::all)]
+            pub mod message_server_client {
+                #[used]
+                #[doc(hidden)]
+                static __FORCE_SECTION_REF: fn() = super::super::super::super::__link_custom_section_describing_imports;
+                use super::super::super::super::_rt;
+                pub type Json = super::super::super::super::ntwk::theater::types::Json;
+                #[doc(hidden)]
+                #[allow(non_snake_case)]
+                pub unsafe fn _export_handle_send_cabi<T: Guest>(
+                    arg0: *mut u8,
+                    arg1: usize,
+                    arg2: *mut u8,
+                    arg3: usize,
+                ) -> *mut u8 {
+                    #[cfg(target_arch = "wasm32")] _rt::run_ctors_once();
+                    let len0 = arg1;
+                    let len1 = arg3;
+                    let result2 = T::handle_send(
+                        _rt::Vec::from_raw_parts(arg0.cast(), len0, len0),
+                        _rt::Vec::from_raw_parts(arg2.cast(), len1, len1),
+                    );
+                    let ptr3 = _RET_AREA.0.as_mut_ptr().cast::<u8>();
+                    let vec4 = (result2).into_boxed_slice();
+                    let ptr4 = vec4.as_ptr().cast::<u8>();
+                    let len4 = vec4.len();
+                    ::core::mem::forget(vec4);
+                    *ptr3.add(4).cast::<usize>() = len4;
+                    *ptr3.add(0).cast::<*mut u8>() = ptr4.cast_mut();
+                    ptr3
+                }
+                #[doc(hidden)]
+                #[allow(non_snake_case)]
+                pub unsafe fn __post_return_handle_send<T: Guest>(arg0: *mut u8) {
+                    let l0 = *arg0.add(0).cast::<*mut u8>();
+                    let l1 = *arg0.add(4).cast::<usize>();
+                    let base2 = l0;
+                    let len2 = l1;
+                    _rt::cabi_dealloc(base2, len2 * 1, 1);
+                }
+                #[doc(hidden)]
+                #[allow(non_snake_case)]
+                pub unsafe fn _export_handle_request_cabi<T: Guest>(
+                    arg0: *mut u8,
+                    arg1: usize,
+                    arg2: *mut u8,
+                    arg3: usize,
+                ) -> *mut u8 {
+                    #[cfg(target_arch = "wasm32")] _rt::run_ctors_once();
+                    let len0 = arg1;
+                    let len1 = arg3;
+                    let result2 = T::handle_request(
+                        _rt::Vec::from_raw_parts(arg0.cast(), len0, len0),
+                        _rt::Vec::from_raw_parts(arg2.cast(), len1, len1),
+                    );
+                    let ptr3 = _RET_AREA.0.as_mut_ptr().cast::<u8>();
+                    let (t4_0, t4_1) = result2;
+                    let vec5 = (t4_0).into_boxed_slice();
+                    let ptr5 = vec5.as_ptr().cast::<u8>();
+                    let len5 = vec5.len();
+                    ::core::mem::forget(vec5);
+                    *ptr3.add(4).cast::<usize>() = len5;
+                    *ptr3.add(0).cast::<*mut u8>() = ptr5.cast_mut();
+                    let vec6 = (t4_1).into_boxed_slice();
+                    let ptr6 = vec6.as_ptr().cast::<u8>();
+                    let len6 = vec6.len();
+                    ::core::mem::forget(vec6);
+                    *ptr3.add(12).cast::<usize>() = len6;
+                    *ptr3.add(8).cast::<*mut u8>() = ptr6.cast_mut();
+                    ptr3
+                }
+                #[doc(hidden)]
+                #[allow(non_snake_case)]
+                pub unsafe fn __post_return_handle_request<T: Guest>(arg0: *mut u8) {
+                    let l0 = *arg0.add(0).cast::<*mut u8>();
+                    let l1 = *arg0.add(4).cast::<usize>();
+                    let base2 = l0;
+                    let len2 = l1;
+                    _rt::cabi_dealloc(base2, len2 * 1, 1);
+                    let l3 = *arg0.add(8).cast::<*mut u8>();
+                    let l4 = *arg0.add(12).cast::<usize>();
+                    let base5 = l3;
+                    let len5 = l4;
+                    _rt::cabi_dealloc(base5, len5 * 1, 1);
+                }
+                pub trait Guest {
+                    fn handle_send(msg: Json, state: Json) -> Json;
+                    fn handle_request(msg: Json, state: Json) -> (Json, Json);
+                }
+                #[doc(hidden)]
+                macro_rules! __export_ntwk_theater_message_server_client_cabi {
+                    ($ty:ident with_types_in $($path_to_types:tt)*) => {
+                        const _ : () = { #[export_name =
+                        "ntwk:theater/message-server-client#handle-send"] unsafe extern
+                        "C" fn export_handle_send(arg0 : * mut u8, arg1 : usize, arg2 : *
+                        mut u8, arg3 : usize,) -> * mut u8 { $($path_to_types)*::
+                        _export_handle_send_cabi::<$ty > (arg0, arg1, arg2, arg3) }
+                        #[export_name =
+                        "cabi_post_ntwk:theater/message-server-client#handle-send"]
+                        unsafe extern "C" fn _post_return_handle_send(arg0 : * mut u8,) {
+                        $($path_to_types)*:: __post_return_handle_send::<$ty > (arg0) }
+                        #[export_name =
+                        "ntwk:theater/message-server-client#handle-request"] unsafe
+                        extern "C" fn export_handle_request(arg0 : * mut u8, arg1 :
+                        usize, arg2 : * mut u8, arg3 : usize,) -> * mut u8 {
+                        $($path_to_types)*:: _export_handle_request_cabi::<$ty > (arg0,
+                        arg1, arg2, arg3) } #[export_name =
+                        "cabi_post_ntwk:theater/message-server-client#handle-request"]
+                        unsafe extern "C" fn _post_return_handle_request(arg0 : * mut
+                        u8,) { $($path_to_types)*:: __post_return_handle_request::<$ty >
+                        (arg0) } };
+                    };
+                }
+                #[doc(hidden)]
+                pub(crate) use __export_ntwk_theater_message_server_client_cabi;
+                #[repr(align(4))]
+                struct _RetArea([::core::mem::MaybeUninit<u8>; 16]);
+                static mut _RET_AREA: _RetArea = _RetArea(
+                    [::core::mem::MaybeUninit::uninit(); 16],
+                );
+            }
             /// Interface for handling WebSocket connections and messages
             #[allow(dead_code, clippy::all)]
             pub mod websocket_server {
@@ -1569,6 +1690,9 @@ macro_rules! __export_unified_chat_impl {
     };
     ($ty:ident with_types_in $($path_to_types_root:tt)*) => {
         $($path_to_types_root)*::
+        exports::ntwk::theater::message_server_client::__export_ntwk_theater_message_server_client_cabi!($ty
+        with_types_in $($path_to_types_root)*::
+        exports::ntwk::theater::message_server_client); $($path_to_types_root)*::
         exports::ntwk::theater::websocket_server::__export_ntwk_theater_websocket_server_cabi!($ty
         with_types_in $($path_to_types_root)*::
         exports::ntwk::theater::websocket_server); $($path_to_types_root)*::
@@ -1584,9 +1708,9 @@ pub(crate) use __export_unified_chat_impl as export;
 #[cfg(target_arch = "wasm32")]
 #[link_section = "component-type:wit-bindgen:0.36.0:ntwk:theater:unified-chat:encoded world"]
 #[doc(hidden)]
-pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 1637] = *b"\
-\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xe2\x0b\x01A\x02\x01\
-A\x19\x01B\x0e\x01p}\x04\0\x04json\x03\0\0\x01p}\x04\0\x05state\x03\0\x02\x01s\x04\
+pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 1784] = *b"\
+\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\xf5\x0c\x01A\x02\x01\
+A\x1b\x01B\x0e\x01p}\x04\0\x04json\x03\0\0\x01p}\x04\0\x05state\x03\0\x02\x01s\x04\
 \0\x08actor-id\x03\0\x04\x01kw\x01r\x03\x0aevent-types\x06parent\x06\x04data\x01\
 \x04\0\x05event\x03\0\x07\x01r\x02\x04hashw\x05event\x08\x04\0\x0ameta-event\x03\
 \0\x09\x01p\x0a\x01r\x01\x06events\x0b\x04\0\x05chain\x03\0\x0c\x03\0\x12ntwk:th\
@@ -1610,21 +1734,25 @@ o\x02ss\x01p\x02\x01k\x01\x01r\x04\x06methods\x03uris\x07headers\x03\x04body\x04
 \x04\x0chttp-request\x02\x03\0\x04\x0dhttp-response\x01B\x08\x02\x03\x02\x01\x01\
 \x04\0\x04json\x03\0\0\x02\x03\x02\x01\x08\x04\0\x0chttp-request\x03\0\x02\x02\x03\
 \x02\x01\x09\x04\0\x0dhttp-response\x03\0\x04\x01@\x01\x03req\x03\0\x05\x04\0\x09\
-send-http\x01\x06\x03\0\x18ntwk:theater/http-client\x05\x0a\x01B\x0d\x01q\x07\x04\
+send-http\x01\x06\x03\0\x18ntwk:theater/http-client\x05\x0a\x02\x03\0\0\x05event\
+\x01B\x09\x02\x03\x02\x01\x01\x04\0\x04json\x03\0\0\x02\x03\x02\x01\x0b\x04\0\x05\
+event\x03\0\x02\x01@\x02\x03msg\x01\x05state\x01\0\x01\x04\0\x0bhandle-send\x01\x04\
+\x01o\x02\x01\x01\x01@\x02\x03msg\x01\x05state\x01\0\x05\x04\0\x0ehandle-request\
+\x01\x06\x04\0\"ntwk:theater/message-server-client\x05\x0c\x01B\x0d\x01q\x07\x04\
 text\0\0\x06binary\0\0\x07connect\0\0\x05close\0\0\x04ping\0\0\x04pong\0\0\x05ot\
 her\x01s\0\x04\0\x0cmessage-type\x03\0\0\x01p}\x01k\x02\x01ks\x01r\x03\x02ty\x01\
 \x04data\x03\x04text\x04\x04\0\x11websocket-message\x03\0\x05\x01p\x06\x01r\x01\x08\
 messages\x07\x04\0\x12websocket-response\x03\0\x08\x01o\x02\x02\x09\x01@\x02\x07\
 message\x06\x05state\x02\0\x0a\x04\0\x0ehandle-message\x01\x0b\x04\0\x1dntwk:the\
-ater/websocket-server\x05\x0b\x02\x03\0\0\x05event\x01B\x06\x02\x03\x02\x01\x01\x04\
-\0\x04json\x03\0\0\x02\x03\x02\x01\x0c\x04\0\x05event\x03\0\x02\x01@\0\0\x01\x04\
-\0\x04init\x01\x04\x04\0\x12ntwk:theater/actor\x05\x0d\x02\x03\0\0\x05state\x01B\
-\x09\x02\x03\x02\x01\x0e\x04\0\x05state\x03\0\0\x02\x03\x02\x01\x08\x04\0\x0chtt\
-p-request\x03\0\x02\x02\x03\x02\x01\x09\x04\0\x0dhttp-response\x03\0\x04\x01o\x02\
-\x05\x01\x01@\x02\x03req\x03\x05state\x01\0\x06\x04\0\x0ehandle-request\x01\x07\x04\
-\0\x18ntwk:theater/http-server\x05\x0f\x04\0\x19ntwk:theater/unified-chat\x04\0\x0b\
-\x12\x01\0\x0cunified-chat\x03\0\0\0G\x09producers\x01\x0cprocessed-by\x02\x0dwi\
-t-component\x070.220.1\x10wit-bindgen-rust\x060.36.0";
+ater/websocket-server\x05\x0d\x01B\x06\x02\x03\x02\x01\x01\x04\0\x04json\x03\0\0\
+\x02\x03\x02\x01\x0b\x04\0\x05event\x03\0\x02\x01@\0\0\x01\x04\0\x04init\x01\x04\
+\x04\0\x12ntwk:theater/actor\x05\x0e\x02\x03\0\0\x05state\x01B\x09\x02\x03\x02\x01\
+\x0f\x04\0\x05state\x03\0\0\x02\x03\x02\x01\x08\x04\0\x0chttp-request\x03\0\x02\x02\
+\x03\x02\x01\x09\x04\0\x0dhttp-response\x03\0\x04\x01o\x02\x05\x01\x01@\x02\x03r\
+eq\x03\x05state\x01\0\x06\x04\0\x0ehandle-request\x01\x07\x04\0\x18ntwk:theater/\
+http-server\x05\x10\x04\0\x19ntwk:theater/unified-chat\x04\0\x0b\x12\x01\0\x0cun\
+ified-chat\x03\0\0\0G\x09producers\x01\x0cprocessed-by\x02\x0dwit-component\x070\
+.220.1\x10wit-bindgen-rust\x060.36.0";
 #[inline(never)]
 #[doc(hidden)]
 pub fn __link_custom_section_describing_imports() {

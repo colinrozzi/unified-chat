@@ -1,4 +1,3 @@
-
 name = "unified-chat"
 version = "0.1.0"
 description = "Unified chat actor for LLM chat application"

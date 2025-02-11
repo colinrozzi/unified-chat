@@ -40,7 +40,8 @@ function connectWebSocket() {
     updateConnectionStatus('connecting');
     
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}/ws`;
+    //const wsUrl = `${protocol}//${window.location.host}/`;
+    const wsUrl = 'ws://localhost:8082/';
     
     ws = new WebSocket(wsUrl);
     
