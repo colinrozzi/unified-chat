@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Chat</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="connectionStatus" class="connection-status disconnected">
+        Disconnected
+    </div>
+
+    <div id="newChatModal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-title">Create New Chat</h3>
+            <input type="text" id="newChatTitle" class="message-input" placeholder="Enter chat title">
+            <div class="modal-buttons">
+                <button onclick="closeNewChatModal()" class="modal-button"
+                    style="padding: 0.5rem 1rem; color: var(--gray-700)">Cancel</button>
+                <button onclick="submitNewChat()" class="send-button">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <button onclick="showNewChatModal()" class="new-chat-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M12 5v14m-7-7h14" stroke-width="2" stroke-linecap="round" />
+                </svg>
+                New Chat
+            </button>
+            <div class="chat-list-container">
+                <div id="chatListLoading" class="loading-overlay">
+                    Loading chats...
+                </div>
+                <div id="chatList" class="chat-list">
+                    <!-- Chat items will be rendered here -->
+                </div>
+            </div>
+        </div>
+
+        <div class="main-chat">
+            <div class="message-area-container">
+                <div id="messageLoading" class="loading-overlay">
+                    Loading messages...
+                </div>
+                <div id="messageArea" class="message-area">
+                    <!-- Messages will be rendered here -->
+                </div>
+            </div>
+            <div class="input-area">
+                <div class="input-container">
+                    <textarea id="messageInput" class="message-input" 
+                        placeholder="Type your message... (Shift+Enter for new line)"
+                        rows="1"></textarea>
+                    <button onclick="sendMessage()" class="send-button">
+                        Send
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M5 12h14m-6-6l6 6-6 6" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="chat.js"></script>
+</body>
+</html>
