@@ -1,0 +1,30 @@
+
+name = "unified-chat"
+version = "0.1.0"
+description = "Unified chat actor for LLM chat application"
+
+component_path = "/Users/colinrozzi/work/actors/unified-chat/target/wasm32-unknown-unknown/release/unified_chat.wasm"
+
+[interface]
+implements = "ntwk:theater/unified-actor"
+requires = []
+
+[[handlers]]
+type = "runtime"
+config = {}
+
+[[handlers]]
+type = "filesystem"
+config = { path = "/Users/colinrozzi/work/actors/unified-chat/assets"}
+
+[[handlers]]
+type = "http-server"
+config = { port = 8081}
+
+[[handlers]]
+type = "websocket-server"
+config = { port = 8082}
+
+[[handlers]]
+type = "http-client"
+config = {}

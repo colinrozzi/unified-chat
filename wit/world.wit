@@ -1,0 +1,11 @@
+package ntwk:theater;
+
+world unified-chat {
+    import runtime;
+    import filesystem;
+    import message-server-host;
+    import http-client;
+    export websocket-server;
+    export actor;
+    export http-server;
+}
